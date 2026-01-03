@@ -29,13 +29,18 @@ geometric_factor = eps_g / (
 # ------------------------------------------------------------
 # Geometria do cilindro
 # ------------------------------------------------------------
-density = 0.15   # distância mínima entre vetores
+Δ = 1e-2   # espaçamento desejado entre vetores
 
-N_r = int(R / density)
-N_theta = int(2*np.pi*R / density)
-N_z = int(L / (2*density))
+N_r     = int((r_b - r_a) / Δ)
+N_theta = int(2*np.pi * ((r_a+r_b)/2) / Δ)
+N_z     = int(L / Δ)
 
-r     = np.linspace(0, R, N_r)
+# garantir mínimo
+N_r     = max(N_r, 5)
+N_theta = max(N_theta, 20)
+N_z     = max(N_z, 5)
+
+r     = np.linspace(r_a, r_b, N_r)
 theta = np.linspace(0, 2*np.pi, N_theta)
 z     = np.linspace(-L/2, L/2, N_z)
 
@@ -48,8 +53,8 @@ x = x.flatten()
 y = y.flatten()
 z = z.flatten()
 
-eps = 1e-6
-mask = np.sqrt(x*x + y*y) > eps
+rv = np.sqrt(x*x + y*y)
+mask = (rv >= r_a) & (rv <= r_b)
 
 x = x[mask]
 y = y[mask]
@@ -59,24 +64,30 @@ z = z[mask]
 # Cálculo de E_r(r,z) e E_z(r, z)
 # ------------------------------------------------------------
 r = np.sqrt(x*x + y*y)
-r[r == 0] = 1e-12
 
 term1 = (z + L/2) / np.sqrt(r**2 + (z + L/2)**2)
 term2 = (z - L/2) / np.sqrt(r**2 + (z - L/2)**2)
-Er = (V_0 * geometric_factor) / (2 * r) * (term1 - term2)
 
-Ez = -(V_0 * geometric_factor) / (2 * r) * (
-    r**2 / (r**2 + (z + L/2)**2)**1.5
+axial_correction_factor = (term1 - term2) / 2
+
+Er = V_0 * geometric_factor / r * axial_correction_factor
+
+Ez = V_0 * geometric_factor * (
+    1 / np.sqrt(r**2 + (z - L/2)**2)
     -
-    r**2 / (r**2 + (z - L/2)**2)**1.5
+    1 / np.sqrt(r**2 + (z + L/2)**2)
 )
 
 # Vetor radial
 Ex = Er * (x / r)
 Ey = Er * (y / r)
 
+# Masks for the dielectrics
+mask_ard = (r >= r_a) & (r <= r_d)
+mask_rdb = (r >= r_d) & (r <= r_b)
+
 vectors = np.vstack((Ex, Ey, Ez)).T
-points  = np.vstack((x, y, z)).T
+points = np.vstack((x, y, z)).T
 
 # ------------------------------------------------------------
 # PREVINIR FLECHAS GIGANTES:
@@ -100,14 +111,14 @@ cloud["mag"] = mag                  # coloração
 glyphs = cloud.glyph(
     orient="vectors",
     scale=False,     # <<--- TAMANHO FIXO
-    factor=0.15,      # <<--- AJUSTE O TAMANHO AQUI
+    factor=Δ * 0.2,       # <<--- AJUSTE O TAMANHO AQUI
 )
 
 plotter.add_mesh(glyphs, scalars="mag", cmap="viridis")
 
 # Cilindro transparente
-cyl = pv.Cylinder(center=(0,0,0), direction=(0,0,1), radius=R, height=L)
-plotter.add_mesh(cyl, color="white", opacity=0.1)
+cyl = pv.Cylinder(center=(0,0,0), direction=(0,0,1), radius=r_b, height=L)
+plotter.add_mesh(cyl, color="blue", opacity=0.1)
 
 plotter.add_axes()
 plotter.show()
