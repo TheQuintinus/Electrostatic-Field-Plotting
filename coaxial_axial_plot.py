@@ -20,11 +20,7 @@ L = 20e-2
 
 V_0 = 10e3
 
-geometric_factor = eps_g / (
-    eps_g * math.log(r_d / r_a)
-    +
-    eps_d * math.log(r_b / r_d)
-)
+geometric_factor = eps_g / (eps_g * math.log(r_d / r_a) + eps_d * math.log(r_b / r_d))
 
 # ------------------------------------------------------------
 # Geometria do cilindro
