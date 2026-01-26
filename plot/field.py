@@ -3,9 +3,9 @@ import numpy as np
 import cylinder
 
 
-class Field:
+class DielectricField:
     """
-    Parâmetros físicos
+    Electric field model for a coaxial cylindrical geometry with a dielectric layer.
     """
 
     eps_0 = 8.854e-12

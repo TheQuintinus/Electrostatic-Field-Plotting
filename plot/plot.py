@@ -2,19 +2,15 @@ import pyvista as pv
 
 import field
 
-# Cilindro transparente
-# cyl = pv.Cylinder(center=(0, 0, 0), direction=(0, 0, 1), radius=r_b, height=L)
-# plotter.add_mesh(cyl, color="blue", opacity=0.1)
-
 
 class Plot:
     """
-    Plot com tamanho de seta constante
+    PyVista plot of the electric field using fixed-size glyphs and magnitude-based coloring.
     """
 
     def __init__(self, glyph_size=2e-3):
         self.glyph_size = glyph_size
-        self.field = field.Field()
+        self.field = field.DielectricField()
         self.plotter = pv.Plotter()
 
     def show(self):
