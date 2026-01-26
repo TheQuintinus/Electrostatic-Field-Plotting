@@ -8,7 +8,7 @@ class Plot:
     PyVista plot of the electric field using fixed-size glyphs and magnitude-based coloring.
     """
 
-    def __init__(self, glyph_size=2e-3):
+    def __init__(self, glyph_size=8e-4):
         self.glyph_size = glyph_size
         self.field = field.DielectricField()
         self.plotter = pv.Plotter()
@@ -20,11 +20,7 @@ class Plot:
         cloud["vectors"] = vectors_unit
         cloud["mag"] = mag
 
-        glyphs = cloud.glyph(
-            orient="vectors",
-            scale=False,  # <<--- TAMANHO FIXO
-            factor=self.glyph_size,
-        )
+        glyphs = cloud.glyph(orient="vectors", scale=False, factor=self.glyph_size)
 
         self.plotter.add_mesh(
             glyphs,
