@@ -4,6 +4,8 @@ Description: Electric field computation and visualization utilities for a
              coaxial cylindrical geometry with a dielectric layer.
 """
 
+import math
+
 import numpy as np
 
 import cylinder
@@ -35,7 +37,9 @@ class DielectricField:
 
     V_0 = 10e3  # Applied voltage [V]
 
-    geometric_factor = eps_g / (eps_g * np.log(r_d / r_a) + eps_d * np.log(r_b / r_d))
+    geometric_factor = eps_g / (
+        eps_g * math.log(r_d / r_a) + eps_d * math.log(r_b / r_d)
+    )
 
     coords = cylinder.CoaxialCylinder(r_a, r_b, L)
 
