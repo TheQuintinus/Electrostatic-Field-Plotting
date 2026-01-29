@@ -43,6 +43,20 @@ The electric field is computed by superposition of finite line charge contributi
 
 ## Installation
 
+### Pre-requisites
+
+Make sure you have Python 3.12 or later installed.  
+Install `pipenv` if you don’t have it yet:
+
+```bash
+pip install --user pipenv
+```
+
+Create the project virtual environment:
+```bash
+pipenv shell
+```
+
 ### Requirements
 
 - Python 3.12 or later
@@ -82,4 +96,4 @@ Future improvements could include:
 
 ## Author
 
-This project was developed as part of a learning effort in applied physics and numerical modeling, with emphasis on clarity, correctness, and extensibility.
+This project emerges from the study of a Dielectric Barrier Discharge (DBD) case and was developed as part of a learning effort in applied physics and numerical modeling, with emphasis on clarity, correctness, and extensibility
