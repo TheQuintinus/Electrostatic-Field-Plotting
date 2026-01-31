@@ -6,10 +6,16 @@ Description:
 """
 
 import math
+from enum import IntEnum, auto
 
 import numpy as np
 
 import cylinder
+
+
+class Region(IntEnum):
+    GAS = auto()
+    DIELECTRIC = auto()
 
 
 class DielectricField:
@@ -128,3 +134,20 @@ class DielectricField:
         mean_error = 1 - (2 / (3 * L)) * (numerator / denominator)
 
         return mean_error
+
+    def regions(self):
+        """
+        Classify each grid point by physical region.
+
+        Returns
+        -------
+        ndarray of shape (N,)
+            Integer region labels (Region.GAS or Region.DIELECTRIC).
+        """
+
+        r, _ = self.coords.rz_coordinates
+
+        regions = np.full(r.shape, Region.GAS, dtype=int)
+        regions[(r >= self.r_d) & (r <= self.r_b)] = Region.DIELECTRIC
+
+        return regions
