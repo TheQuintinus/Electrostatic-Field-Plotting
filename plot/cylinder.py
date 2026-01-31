@@ -6,10 +6,17 @@ Description:
 
 from dataclasses import dataclass
 from functools import cached_property
+from typing import NamedTuple
 
 import numpy as np
 from numpy import float64
 from numpy.typing import NDArray
+
+
+class CartesianField(NamedTuple):
+    points: NDArray[float64]
+    vectors_unit: NDArray[float64]
+    magnitude: NDArray[float64]
 
 
 @dataclass
@@ -168,8 +175,9 @@ class CoaxialCylinder:
         points = np.vstack((x, y, z)).T
 
         mag: NDArray[float64] = np.linalg.norm(vectors, axis=1)
+
         mag_safe: NDArray[float64] = np.maximum(mag, 1e-15)
 
         vectors_unit = vectors / mag_safe[:, None]
 
-        return points, vectors_unit, mag
+        return CartesianField(points, vectors_unit, mag)
