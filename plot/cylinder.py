@@ -1,3 +1,9 @@
+"""
+Author: oQuintino
+Description:
+    Geometry and coordinate utilities for coaxial cylindrical simulations.
+"""
+
 from dataclasses import dataclass
 from functools import cached_property
 

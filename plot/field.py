@@ -1,7 +1,8 @@
 """
 Author: oQuintino
-Description: Electric field computation and visualization utilities for a
-             coaxial cylindrical geometry with a dielectric layer.
+Description:
+    Utilities for computing and analyzing the electric field inside a
+    finite-length coaxial cylindrical structure with a dielectric layer.
 """
 
 import math

@@ -1,3 +1,10 @@
+"""
+Author: oQuintino
+Description:
+    Visualization utilities for rendering the electric field of the coaxial
+    dielectric cylinder using PyVista.
+"""
+
 import numpy as np
 import pyvista as pv
 
