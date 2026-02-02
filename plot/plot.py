@@ -68,14 +68,14 @@ class Plot:
         self.plotter.add_mesh(
             glyphs_gas,
             scalars="mag_gas",
-            cmap="plasma",
+            cmap="viridis",
             scalar_bar_args={"title": "|E| GAS [V/m]"},
         )
 
         self.plotter.add_mesh(
             glyphs_diel,
             scalars="mag_diel",
-            cmap="viridis",
+            cmap="plasma",
             scalar_bar_args={"title": "|E| DIELECTRIC [V/m]"},
         )
 
