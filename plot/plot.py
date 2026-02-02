@@ -8,7 +8,7 @@ Description:
 import numpy as np
 import pyvista as pv
 
-import field
+from field import DielectricField, Region
 
 
 class Plot:
@@ -30,7 +30,7 @@ class Plot:
         """
 
         self.glyph_size = glyph_size
-        self.field = field.DielectricField()
+        self.field = DielectricField()
         self.plotter = pv.Plotter()
 
     def show(self):
@@ -48,17 +48,35 @@ class Plot:
 
         points, vectors_unit, mag = self.field.calculate_field()
 
+        regions = self.field.regions()
+
         cloud = pv.PolyData(points)
         cloud["vectors"] = vectors_unit
-        cloud["mag"] = mag
+        cloud["region"] = self.field.regions()
+
+        mag_gas = np.where(regions == Region.GAS, mag, np.nan)
+        mag_diel = np.where(regions == Region.DIELECTRIC, mag, np.nan)
+
+        cloud["mag_gas"] = mag_gas
+        cloud["mag_diel"] = mag_diel
 
         glyphs = cloud.glyph(orient="vectors", scale=False, factor=self.glyph_size)
 
+        glyphs_gas = glyphs.threshold(Region.GAS, scalars="region")
+        glyphs_diel = glyphs.threshold(Region.DIELECTRIC, scalars="region")
+
         self.plotter.add_mesh(
-            glyphs,
-            scalars="mag",
+            glyphs_gas,
+            scalars="mag_gas",
+            cmap="plasma",
+            scalar_bar_args={"title": "|E| GAS [V/m]"},
+        )
+
+        self.plotter.add_mesh(
+            glyphs_diel,
+            scalars="mag_diel",
             cmap="viridis",
-            scalar_bar_args={"title": "|E| [V/m]"},
+            scalar_bar_args={"title": "|E| DIELECTRIC [V/m]"},
         )
 
         error = self.field.mean_radial_error() * 100
