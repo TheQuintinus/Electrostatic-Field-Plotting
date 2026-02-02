@@ -147,7 +147,7 @@ class DielectricField:
 
         r, _ = self.coords.rz_coordinates
 
-        regions = np.full(r.shape, Region.GAS, dtype=int)
-        regions[(r >= self.r_d) & (r <= self.r_b)] = Region.DIELECTRIC
+        regions = np.full(r.shape, Region.DIELECTRIC, dtype=int)
+        regions[(r >= self.r_d) & (r <= self.r_b)] = Region.GAS
 
         return regions
