@@ -159,11 +159,12 @@ class CoaxialCylinder:
             Magnitude of the field vectors.
         """
 
-        if Er.shape != Ez.shape:
-            raise ValueError("Er and Ez must match the number of grid points.")
-
         x, y, z = self.points
+
         r = np.sqrt(x**2 + y**2)
+
+        if Er.shape != Ez.shape or Er.shape != r.shape:
+            raise ValueError("Er and Ez must match the number of grid points.")
 
         # Avoid division by zero at the axis
         r_safe = np.maximum(r, 1e-15)
