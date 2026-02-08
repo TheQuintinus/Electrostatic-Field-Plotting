@@ -52,7 +52,7 @@ class Plot:
 
         cloud = pv.PolyData(points)
         cloud["vectors"] = vectors_unit
-        cloud["region"] = self.field.regions()
+        cloud["region"] = regions
 
         mag_gas = np.where(regions == Region.GAS, mag, np.nan)
         mag_diel = np.where(regions == Region.DIELECTRIC, mag, np.nan)
