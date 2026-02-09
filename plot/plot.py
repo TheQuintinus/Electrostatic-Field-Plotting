@@ -128,6 +128,25 @@ class PlotBuilder:
             color="black",
         )
 
+    def set_isometric_z_right(self):
+        """
+        Set an isometric view where the physical Z axis points to the right
+        on the screen.
+        """
+
+        pv.Plotter.enable_parallel_projection(self.plotter)
+
+        cam = self.plotter.camera
+
+        # Camera looks diagonally at the origin
+        cam.focal_point = (0, 0, 0)
+        cam.position = (1, -1, 1)
+
+        # Screen-up is +Y, so screen-right becomes +Z
+        cam.up = (0, 1, 0)
+
+        cam.zoom(1.2)
+
     def show(self):
         """
         Render the visualization and start the interactive PyVista window.
