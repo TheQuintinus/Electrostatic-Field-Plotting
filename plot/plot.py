@@ -5,6 +5,8 @@ Description:
     dielectric cylinder using PyVista.
 """
 
+from functools import cached_property
+
 import numpy as np
 import pyvista as pv
 from field import DielectricField, Region
@@ -38,32 +40,54 @@ class PlotBuilder:
         self.field = DielectricField()
         self.plotter = pv.Plotter()
 
-    def add_glyphs(self):
+    @cached_property
+    def cloud(self):
         """
-        Add electric field glyphs to the plot.
+        Cached point cloud containing all data required for visualization.
 
-        This method computes the electric field, constructs a point cloud,
-        attaches vector, magnitude, and region data, and renders oriented
-        glyphs with fixed size.
-
-        Glyphs are colored by field magnitude using distinct colormaps
-        for each physical region (gas and dielectric).
+        This property computes the electric field once and constructs a
+        PyVista PolyData object holding:
+        - Cartesian coordinates of the grid points
+        - Unit electric field vectors
+        - Field magnitude
+        - Region classification labels
+        - Region-specific masked magnitudes
         """
 
         points, vectors_unit, mag = self.field.calculate_field()
-        regions = self.field.regions()
+        regions = self.field.regions().astype(np.int8)
 
         cloud = pv.PolyData(points)
+
+        # Vector data
         cloud["vectors"] = vectors_unit
+
+        # Global magnitude
+        cloud["magnitude"] = mag
+
+        # Region labels
         cloud["region"] = regions
 
-        mag_gas = np.where(regions == Region.GAS, mag, np.nan)
-        mag_diel = np.where(regions == Region.DIELECTRIC, mag, np.nan)
+        # Region-specific magnitudes (NaN-masked)
+        cloud["mag_gas"] = np.where(regions == Region.GAS, mag, np.nan)
+        cloud["mag_diel"] = np.where(regions == Region.DIELECTRIC, mag, np.nan)
 
-        cloud["mag_gas"] = mag_gas
-        cloud["mag_diel"] = mag_diel
+        return cloud
 
-        glyphs = cloud.glyph(orient="vectors", scale=False, factor=self.glyph_size)
+    def add_glyphs(self):
+        """
+        Add electric field glyphs to the plot using the cached cloud.
+
+        This method renders oriented glyphs at the cloud points using the
+        unit electric field vectors. Glyph size is fixed and independent
+        of field magnitude.
+
+        Field magnitude is encoded by color, with separate colormaps
+        applied to each physical region (gas and dielectric) based on
+        region-specific scalar fields stored in the cloud.
+        """
+
+        glyphs = self.cloud.glyph(orient="vectors", scale=False, factor=self.glyph_size)
 
         glyphs_gas = glyphs.threshold(Region.GAS, scalars="region")
         glyphs_diel = glyphs.threshold(Region.DIELECTRIC, scalars="region")
@@ -86,13 +110,16 @@ class PlotBuilder:
         """
         Add Cartesian reference axes to the plot.
 
-        The axes are centered at the origin and extend symmetrically
-        based on the current bounds of the plotted geometry or data.
-        Colors follow the convention:
+        The axis extents are determined from the spatial extent of the
+        cached cloud, ensuring that the axes are well-scaled and independent
+        of the order in which plot elements are added.
+
+        Axes are centered at the origin and colored according to the
+        standard convention:
         x-axis (red), y-axis (green), z-axis (blue).
         """
 
-        axis_length = np.max(np.abs(self.plotter.bounds))
+        axis_length = np.max(np.abs(self.cloud.points))
 
         x_axis = pv.Line((-axis_length, 0, 0), (axis_length, 0, 0))
         y_axis = pv.Line((0, -axis_length, 0), (0, axis_length, 0))
