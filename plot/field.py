@@ -81,23 +81,20 @@ class DielectricField:
 
         r, z = self.coords.rz_coordinates
 
-        # Prevent singularities at r = 0
-        r_safe = np.maximum(r, 1e-15)
-
         half_L = self.L / 2
 
         zp = z + half_L
         zm = z - half_L
 
-        rp = np.hypot(r_safe, zp)
-        rm = np.hypot(r_safe, zm)
+        rp = np.hypot(r, zp)
+        rm = np.hypot(r, zm)
 
         term1 = zp / rp
         term2 = zm / rm
 
         axial_factor = (term1 - term2) / 2
 
-        Er = self.V_0 * self.geometric_factor * axial_factor / r_safe
+        Er = self.V_0 * self.geometric_factor * axial_factor / r
         Ez = self.V_0 * self.geometric_factor * (1 / rm - 1 / rp)
 
         # Dielectric correction (field scaling by permittivity ratio)

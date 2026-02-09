@@ -60,6 +60,8 @@ class CoaxialCylinder:
     L: float
     Δ: float = 1e-2  # Spatial resolution
 
+    EPS = 1e-15
+
     @cached_property
     def spaced_coordinates(self):
         """
@@ -131,7 +133,8 @@ class CoaxialCylinder:
         Return cylindrical (r, z) coordinates for all grid points.
 
         Useful for problems with axial symmetry where angular dependence
-        is not required.
+        is not required. The radial coordinate is regularized to avoid
+        singularities at the axis.
 
         Returns
         -------
@@ -143,9 +146,12 @@ class CoaxialCylinder:
 
         x, y, z = self.points
 
-        r: NDArray[float64] = np.hypot(x, y)
+        r = np.hypot(x, y)
 
-        return r, z
+        # Prevent singularities at r = 0
+        r_safe: NDArray[float64] = np.maximum(r, self.EPS)
+
+        return r_safe, z
 
     def to_cartesian(self, Er: NDArray[float64], Ez: NDArray[float64]):
         """
@@ -176,7 +182,7 @@ class CoaxialCylinder:
             raise ValueError("Er and Ez must match the number of grid points.")
 
         # Avoid division by zero at the axis
-        r_safe = np.maximum(r, 1e-15)
+        r_safe = np.maximum(r, self.EPS)
 
         Ex = Er * (x / r_safe)
         Ey = Er * (y / r_safe)
