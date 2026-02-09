@@ -7,7 +7,6 @@ Description:
 
 import numpy as np
 import pyvista as pv
-
 from field import DielectricField, Region
 
 

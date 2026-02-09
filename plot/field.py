@@ -9,9 +9,8 @@ import math
 from dataclasses import dataclass
 from enum import IntEnum, auto
 
-import numpy as np
-
 import cylinder
+import numpy as np
 
 
 class Region(IntEnum):

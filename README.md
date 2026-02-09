@@ -76,7 +76,7 @@ clarity, reusability, and extensibility of the code.
 
 ### Pre-requisites
 
-Make sure you have Python 3.12 or later installed.  
+Make sure you have Python 3.12 or later installed.
 Install `pipenv` if you don’t have it yet:
 
 ```bash
